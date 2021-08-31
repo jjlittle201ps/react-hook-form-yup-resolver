@@ -1,82 +1,63 @@
-import Head from 'next/head'
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from "yup";
 
-export default function Home() {
+const validationSchema = Yup.object().shape({
+  fullname: Yup.string().required('Fullname is required'),
+  username: Yup.string()
+    .required('Username is required')
+    .min(6, 'Username must be at least 6 characters')
+    .max(20, 'Username must not exceed 20 characters'),
+  email: Yup.string()
+    .required('Email is required')
+    .email('Email is invalid'),
+  password: Yup.string()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters')
+    .max(40, 'Password must not exceed 40 characters'),
+  confirmPassword: Yup.string()
+    .required('Confirm Password is required')
+    .oneOf([Yup.ref('password'), null], 'Password does not match'),
+  acceptTerms: Yup.bool().oneOf([true], 'Confirm you have read and understood the terms and conditions')
+});
+const onSubmit = data => console.log(data);
+
+export default function App() {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    mode: "onChange",
+    resolver: yupResolver(validationSchema),
+  });
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div className="p-20">
+      <div className="text-6xl p-10 text-blue-500">Form Test</div>
+      <form onSubmit={handleSubmit(onSubmit)} >
+        <div className="grid grid-cols-1 px-20 items-center justify-center gap-5">
+          <label className=" mr-4" htmlFor="fullname">Full Name:</label>
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"{...register("fullname")} />
+          <p className="text-red-500 text-opacity-75">{errors.fullname?.message}</p>
+          <label className=" mr-4" htmlFor="username">User Name:</label>
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="number" {...register("username")} />
+          <p className="text-red-500 text-opacity-75">{errors.username?.message}</p>
+          <label className=" mr-4" htmlFor="email">Email:</label>
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"{...register("email")} />
+          <p className="text-red-500 text-opacity-75">{errors.email?.message}</p>
+          <label className=" mr-4" htmlFor="password">Password:</label>
+          <input type="password" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"{...register("password")} />
+          <p className="text-red-500 text-opacity-75">{errors.password?.message}</p>
+          <label className=" mr-4" htmlFor="confirmPassword">Confirm Password:</label>
+          <input type="password" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"{...register("confirmPassword")} />
+          <p className="text-red-500 text-opacity-75">{errors.confirmPassword?.message}</p>
+          <label className=" mr-4" htmlFor="acceptTerms">Accept Terms:</label>
+          <input type="checkbox" {...register("acceptTerms")} />
+          <p className="text-red-500 text-opacity-75">{errors.acceptTerms?.message}</p>
+          <input className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit" />
 
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
-
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="p-3 font-mono text-lg bg-gray-100 rounded-md">
-            pages/index.js
-          </code>
-        </p>
-
-        <div className="flex flex-wrap items-center justify-around max-w-4xl mt-6 sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
         </div>
-      </main>
 
-      <footer className="flex items-center justify-center w-full h-24 border-t">
-        <a
-          className="flex items-center justify-center"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="h-4 ml-2" />
-        </a>
-      </footer>
+      </form>
+
     </div>
-  )
-}
+  );
+};
